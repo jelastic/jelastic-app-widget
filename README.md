@@ -35,7 +35,7 @@ The widget from this guide is the most straightforward way to add the appropriat
     ```
     
 | Parameter        | Description                                       | Default Value  |
-| ---------------- |:-------------------------------------------------:| -----:|
+| ---------------- |---------------------------------------------------| -----|
 | data-text        | The default text (title) displayed on the button. | GET HOSTED NOW |
 | data-tx-success  | A text displayed upon operation success.          | CHECK YOUR EMAIL |
 | data-tx-error    | A text displayed in case of an error.             | An error has occurred, please try again later. |
