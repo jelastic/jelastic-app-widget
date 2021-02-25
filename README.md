@@ -11,7 +11,7 @@ The widget from this guide is the most straightforward way to add the appropriat
     - https://raw.githubusercontent.com/jelastic/app-widget/master/dist/jlc-app-widget.js
     
 2. Enable these scripts on any page by adding the following lines between the `<head>` and `</body>` tags:
-    ```
+    ```html
     <script async src="{siteUrl}/jlc-app-widget.js"></script>
     <link rel="stylesheet" href="{SiteUrl}/css/jlc-app-widget.css">
     ```
