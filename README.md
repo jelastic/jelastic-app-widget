@@ -2,7 +2,7 @@
 
 You can offer a solution that will automatically install an application for your customer in just a few clicks (provide an email and confirm via inbox). The ready-to-work button for installation looks as follows:
 
-![Jelastic marketplace screenshot](screenshot-1.png)
+![Jelastic install app screenshot](screenshot-1.png)
 
 The widget from this guide is the most straightforward way to add the appropriate button to your website. The only requirement is [jQuery](https://jquery.com/) JavaScript library. The process is simple:
 
