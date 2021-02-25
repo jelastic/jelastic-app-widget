@@ -2,11 +2,37 @@
     // init scripts
     const wrapper_elements = document.getElementsByClassName('jlc-app');
     const body = document.getElementsByTagName('body')[0];
+    var galoaded = document.querySelector('script[src*="google-analytics.com/analytics.js"]');
 
     Array.from(wrapper_elements).forEach((wrapper) => {
         ToggleShowElement(wrapper, false);
 
+        const app_id = wrapper.getAttribute('data-app-id') || false,
+            manifest = wrapper.getAttribute('data-manifest') || false;
+
+        if ((!!app_id && !!manifest) || (!app_id && !manifest)) {
+            console.error('Jelastic install app widget: Please input one application parameter (data-app-id OR data-manifest).');
+            return false;
+        }
+
+        if (!!manifest) {
+            if (!isURL(manifest) && !manifest.startsWith('{')) {
+                console.error('Jelastic install app widget: Manifest parameter is incorrect');
+                return false;
+            }
+        }
+
         const jlc_button_text = wrapper.getAttribute('data-text') || 'GET STARTED FOR FREE';
+        var gacode = wrapper.getAttribute('data-track-ga') || false;
+        galoaded = document.querySelector('script[src*="google-analytics.com/analytics.js"]');
+
+        if(!galoaded && !!gacode) {
+            (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){ (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o), m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m) })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+            ga('create', gacode, 'auto', {'allowLinker': true});
+            ga('require', 'linker');
+            ga('linker:autoLink', ['jelastic.cloud']);
+            ga('send', 'pageview');
+        }
 
         // create HTML elements
         // create main element
@@ -56,17 +82,10 @@
         jlc_input_element.addEventListener("change", ValidateInputedEmail, false);
         jlc_input_element.addEventListener("keyup", ValidateInputedEmail, false);
 
+        ToggleShowElement(wrapper, true)
+
     });
 
-    document.onreadystatechange = function () {
-        if (document.readyState === 'complete') {
-            Array.from(wrapper_elements).forEach((wrapper) => {
-                // SetFormWithByButton(wrapper)
-                ToggleShowElement(wrapper, true)
-            })
-
-        }
-    }
 
     // FUNCTIONS
     /* create DOM element function.
@@ -128,44 +147,6 @@
             wrapper.style.width = wrapper.style.minWidth = jlc_form_btn.style.width = jlc_form_element_minWidth;
         }
     }
-
-    function SetFormWithByButton(wrapper) {
-        const jlc_btn_element = wrapper.getElementsByClassName("jlc-btn")[0],
-            jlc_cover_element = wrapper.getElementsByClassName("jlc-app-cover")[0],
-            jlc_input_element = wrapper.getElementsByClassName("jlc-input")[0];
-
-        const jlc_btn_element_style = window.getComputedStyle ? getComputedStyle(jlc_btn_element, null) : jlc_btn_element.currentStyle;
-        const jlc_btn_element_width = Math.ceil(parseFloat(jlc_btn_element_style.width.replace(/[^0-9 | ^.]/g, ''))) || 0;
-        wrapper.style.width = jlc_btn_element.style.width = jlc_btn_element_width + 'px';
-
-
-        if (jlc_btn_element_width < 230) {
-            wrapper.style.width = jlc_btn_element.style.width = '270px';
-            VanilaAddClass(jlc_cover_element, 'jlc-cover--medium')
-        } else if ((jlc_btn_element_width > 230) && (jlc_btn_element_width < 270)) {
-            VanilaAddClass(jlc_cover_element, 'jlc-cover--medium');
-        }
-        // if (jlc_btn_element_width < 270) {
-        //     jlc_input_element.addEventListener("change", ChangeFormSize, false);
-        // }
-    }
-
-    // function ChangeFormSize() {
-    //     // disable on "Enter" key
-    //     // if (event.keyCode !== 13) {
-    //         const wrapper = FindClosestAncestor(this, '.jlc-app'),
-    //             jlc_btn_element = wrapper.getElementsByClassName("jlc-btn")[0],
-    //             jlc_cover_element = wrapper.getElementsByClassName("jlc-app-cover")[0];
-    //         let newWidth = (110 + (this.value.length + 1) * 8);
-    //         wrapper.style.width = newWidth + 'px';
-    //         jlc_btn_element.style.width = newWidth + 'px';
-    //         if (newWidth > 230) {
-    //             VanilaAddClass(jlc_cover_element, 'jlc-cover--succeeddef')
-    //         } else {
-    //             VanilaRemoveClasss(jlc_cover_element, 'jlc-cover--succeeddef')
-    //         }
-    //     // }
-    // }
 
     function VanilaAddClass(element, className) {
         if (element.classList) {
@@ -253,13 +234,68 @@
         }
     }
 
+    function trackGA(oParams) {
+
+        var oOptions = {
+            "hitType": "event",
+            "eventCategory": oParams.category,
+            "eventAction": oParams.action || '',
+            "eventLabel": oParams.label || ''
+        };
+        
+
+        if (Object.prototype.hasOwnProperty.call(oParams, "value")) {
+            oOptions.eventValue = oParams.value;
+        }
+
+        if (window.ga) {
+            ga("send", oOptions);
+        }
+
+
+        if (oOptions.hitCallback) {
+            if (window.ga) {
+                setTimeout(oParams.hitCallback, 1500);
+            } else {
+                oOptions.hitCallback();
+            }
+        }
+    }
+
+    function trackInstallSuccess(sHoster, app) {
+        trackGA({
+            category: "installapp-widget-success",
+            action: sHoster,
+            label: app,
+        });
+    }
+
+    function trackInstallError(sHoster, app) {
+        trackGA({
+            category: "installapp-widget-error",
+            action: sHoster,
+            label: app
+        });
+    }
+
+    function isURL(str) {
+        var pattern = new RegExp('^(https?:\\/\\/)?'+ // protocol
+            '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ // domain name
+            '((\\d{1,3}\\.){3}\\d{1,3}))'+ // OR ip (v4) address
+            '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ // port and path
+            '(\\?[;&a-z\\d%_.~+=-]*)?'+ // query string
+            '(\\#[-a-z\\d_]*)?$','i'); // fragment locator
+        return !!pattern.test(str);
+    }
+
     function SubmitForm(event) {
         event.preventDefault();
 
         const wrapper = FindClosestAncestor(this, '.jlc-app'),
             jlc_form_element = wrapper.getElementsByClassName("jlc-form")[0],
             jlc_sbmt_element = wrapper.getElementsByClassName("jlc-sbmt")[0],
-            jlc_input_element = wrapper.getElementsByClassName("jlc-input")[0];
+            jlc_input_element = wrapper.getElementsByClassName("jlc-input")[0],
+            trackEvent = !!wrapper.getAttribute('data-track-ga') || false;
 
         if (!jlc_form_element.classList.contains('jlc-form__valid')) {
             ShowErrorMessage('Email is not valid', wrapper);
@@ -268,9 +304,10 @@
 
         const jlc_text_error = wrapper.getAttribute('data-tx-error') || 'An error has occurred, please try again later',
             jlc_text_success = wrapper.getAttribute('data-tx-success') || 'CHECK YOUR EMAIL',
-            app_id = wrapper.getAttribute('data-app-id') || 'An error has occurred, please try again later',
+            app_id = wrapper.getAttribute('data-app-id') || false,
+            manifest = wrapper.getAttribute('data-manifest') || false,
             group = wrapper.getAttribute('data-group') || '',
-            jlc_hoster_domain = wrapper.getAttribute('data-key') || 'jelastichosting.nl';
+            jlc_hoster_domain = wrapper.getAttribute('data-key') || false;
 
         VanilaAddClass(jlc_form_element, 'jlc-form__sending');
 
@@ -280,9 +317,8 @@
             wrapper.removeChild(jlc_error_element)
         }
 
-        const email = jlc_input_element.value;
-
-        const modal = document.getElementById('AppHostersModal');
+        const email = jlc_input_element.value,
+            modal = document.getElementById('AppHostersModal');
 
         if (modal && wrapper.classList.contains('hosters-modal-call')) {
             const modal_email = document.getElementById('user_email');
@@ -292,9 +328,12 @@
             VanilaRemoveClasss(jlc_form_element, 'jlc-form__sending');
 
         } else {
+
+            var installAppURL = jlc_hoster_domain.replace('app.', 'reg.');
+            installAppURL = '//' + installAppURL + '/installapp';
+
             var data = {
                 email: email,
-                app: app_id,
                 key: jlc_hoster_domain,
                 group: group,
                 iref: document.location.href,
@@ -302,10 +341,16 @@
                 lang: 'en'
             };
 
+            if (app_id) {
+                data['id'] = app_id;
+            } else {
+                data['manifest'] = manifest;
+            }
+
             $.ajax({
                 type: 'POST',
                 data: data,
-                url: '//go.jelastic.com/InstallApp',
+                url: installAppURL,
                 success: function (response) {
                     var oResp = jQuery.parseJSON(response) || {};
 
@@ -314,19 +359,28 @@
                         VanilaAddClass(jlc_form_element, 'jlc-form__succeed')
                         jlc_sbmt_element.disabled = jlc_input_element.disabled = true;
                         jlc_input_element.value = jlc_text_success;
+
+                        if (trackEvent) {
+                            trackInstallSuccess(jlc_hoster_domain, app_id);
+                        }
                     } else {
                         ShowErrorMessage(jlc_text_error, wrapper);
                         VanilaRemoveClasss(jlc_form_element, 'jlc-form__sending');
+                        if (trackEvent) {
+                            trackInstallError(jlc_hoster_domain, app_id);
+                        }
                     }
                 },
                 error: function (response) {
                     ShowErrorMessage(jlc_text_error, wrapper);
                     VanilaRemoveClasss(jlc_form_element, 'jlc-form__sending');
+                    if (trackEvent) {
+                        trackInstallError(jlc_hoster_domain, app_id);
+                    }
                 }
             });
         }
     }
-
 
     $.each(wrapper_elements, function (index, wrapper) {
         if (!$(wrapper).attr('data-key')) {
@@ -444,10 +498,14 @@
                                                     jlc_input_element = wrapper.getElementsByClassName("jlc-input")[0],
                                                     jlc_text_error = wrapper.getAttribute('data-tx-error') || 'An error has occurred, please try again later',
                                                     jlc_text_success = wrapper.getAttribute('data-tx-success') || 'CHECK YOUR EMAIL',
-                                                    app_id = wrapper.getAttribute('data-app-id') || 'An error has occurred, please try again later',
+                                                    trackEvent = !!wrapper.getAttribute('data-track-ga') || false,
+                                                    app_id = wrapper.getAttribute('data-app-id') || false,
+                                                    manifest = wrapper.getAttribute('data-manifest') || false,
                                                     group = wrapper.getAttribute('data-group') || '',
-                                                    jlc_hoster_domain = this.querySelector('input[name="hoster"]:checked').getAttribute('data-key') || 'jelastichosting.nl',
+                                                    jlc_hoster_domain = this.querySelector('input[name="hoster"]:checked').getAttribute('data-key') || false,
                                                     jlc_email_element = document.getElementById('user_email');
+
+
 
                                                 VanilaAddClass(this, 'loading');
 
@@ -456,9 +514,17 @@
 
                                                 const email = jlc_email_element.value;
 
+                                                const msg = JSON.stringify({
+                                                    app: app_id,
+                                                    email: email,
+                                                    group: group,
+                                                });
+
+                                                var installAppURL = jlc_hoster_domain.replace('app.', 'reg.');
+                                                installAppURL = '//' + installAppURL + '/installapp';
+
                                                 var data = {
                                                     email: email,
-                                                    app: app_id,
                                                     key: jlc_hoster_domain,
                                                     group: group,
                                                     iref: document.location.href,
@@ -466,10 +532,16 @@
                                                     lang: 'en'
                                                 };
 
+                                                if (app_id) {
+                                                    data['id'] = app_id;
+                                                } else {
+                                                    data['manifest'] = manifest;
+                                                }
+
                                                 $.ajax({
                                                     type: 'POST',
                                                     data: data,
-                                                    url: '//go.jelastic.com/InstallApp',
+                                                    url: installAppURL,
                                                     success: function (response) {
                                                         var oResp = jQuery.parseJSON(response) || {};
 
@@ -481,12 +553,18 @@
                                                             VanilaAddClass(jlc_form_element, 'jlc-form__succeed');
                                                             jlc_sbmt_element.disabled = jlc_input_element.disabled = true;
                                                             jlc_input_element.value = jlc_text_success;
+                                                            if (trackEvent) {
+                                                                trackInstallSuccess(jlc_hoster_domain, msg);
+                                                            }
                                                         } else {
                                                             modalHide(hosters_modal_element, function () {
                                                                 body.classList.remove('modal-open');
                                                             });
                                                             ShowErrorMessage(jlc_text_error, wrapper);
                                                             VanilaRemoveClasss(jlc_form_element, 'jlc-form__sending');
+                                                            if (trackEvent) {
+                                                                trackInstallError(jlc_hoster_domain, msg);
+                                                            }
                                                         }
                                                     },
                                                     error: function (response) {
@@ -495,6 +573,9 @@
                                                         });
                                                         ShowErrorMessage(jlc_text_error, wrapper);
                                                         VanilaRemoveClasss(jlc_form_element, 'jlc-form__sending');
+                                                        if (trackEvent) {
+                                                            trackInstallError(jlc_hoster_domain, msg);
+                                                        }
                                                     }
                                                 });
                                             }
@@ -513,6 +594,9 @@
                                             jlc_modal_form.append(jlc_modal_form_grid);
 
                                             $.each(window.hosters, function (index, hoster) {
+                                                
+                                                if (!hoster.hasSignup) return;
+                                                
                                                 var jlc_modal_form_hoster = CreateElement('div', {
                                                     className: 'hoster'
                                                 });

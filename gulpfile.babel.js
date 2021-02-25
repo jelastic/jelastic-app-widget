@@ -23,7 +23,6 @@ import focus from 'postcss-focus';
 
 const postCSSprocessors = [
   charset(),
-  unprefix(),
   discardDuplicates(),
   discardEmpty(),
   mqpacker({
@@ -100,9 +99,6 @@ gulp.task('images', function() {
     .pipe(plugins.imagemin([
       plugins.imagemin.gifsicle({
         interlaced: true
-      }),
-      plugins.imagemin.jpegtran({
-        progressive: true
       }),
       plugins.imagemin.optipng({
         optimizationLevel: 5
