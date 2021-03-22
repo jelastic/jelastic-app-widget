@@ -1,91 +1,89 @@
 (function () {
     // init scripts
-    const wrapper_elements = document.getElementsByClassName('jlc-app');
-    const body = document.getElementsByTagName('body')[0];
+    var wrapper_elements = document.getElementsByClassName('jlc-app');
+    var body = document.getElementsByTagName('body')[0];
     var galoaded = document.querySelector('script[src*="google-analytics.com/analytics.js"]');
 
-    Array.from(wrapper_elements).forEach((wrapper) => {
+    $.each(wrapper_elements, function (index, wrapper) {
         ToggleShowElement(wrapper, false);
 
-        const app_id = wrapper.getAttribute('data-app-id') || false,
-            manifest = wrapper.getAttribute('data-manifest') || false;
+            var app_id = wrapper.getAttribute('data-app-id') || false,
+                manifest = wrapper.getAttribute('data-manifest') || false;
 
-        if ((!!app_id && !!manifest) || (!app_id && !manifest)) {
-            console.error('Jelastic install app widget: Please input one application parameter (data-app-id OR data-manifest).');
-            return false;
-        }
-
-        if (!!manifest) {
-            if (!isURL(manifest) && !manifest.startsWith('{')) {
-                console.error('Jelastic install app widget: Manifest parameter is incorrect');
+            if ((!!app_id && !!manifest) || (!app_id && !manifest)) {
+                console.error('Jelastic install app widget: Please input one application parameter (data-app-id OR data-manifest).');
                 return false;
             }
-        }
 
-        const jlc_button_text = wrapper.getAttribute('data-text') || 'GET STARTED FOR FREE';
-        var gacode = wrapper.getAttribute('data-track-ga') || false;
-        galoaded = document.querySelector('script[src*="google-analytics.com/analytics.js"]');
+            if (!!manifest) {
+                if (!isURL(manifest) && !manifest.startsWith('{')) {
+                    console.error('Jelastic install app widget: Manifest parameter is incorrect');
+                    return false;
+                }
+            }
 
-        if(!galoaded && !!gacode) {
-            (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){ (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o), m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m) })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-            ga('create', gacode, 'auto', {'allowLinker': true});
-            ga('require', 'linker');
-            ga('linker:autoLink', ['jelastic.cloud']);
-            ga('send', 'pageview');
-        }
+            var jlc_button_text = wrapper.getAttribute('data-text') || 'GET STARTED FOR FREE';
+            var gacode = wrapper.getAttribute('data-track-ga') || false;
+            galoaded = document.querySelector('script[src*="google-analytics.com/analytics.js"]');
 
-        // create HTML elements
-        // create main element
-        const jlc_cover_element = CreateElement('div', {
-            className: 'jlc-app-cover'
-        });
-        wrapper.appendChild(jlc_cover_element);
+            if(!galoaded && !!gacode) {
+                (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){ (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o), m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m) })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+                ga('create', gacode, 'auto', {'allowLinker': true});
+                ga('require', 'linker');
+                ga('linker:autoLink', ['jelastic.cloud']);
+                ga('send', 'pageview');
+            }
 
-        // create main button
-        const jlc_btn_element = CreateElement('button', {
-            className: 'jlc-btn'
-        }, jlc_button_text);
-        jlc_cover_element.appendChild(jlc_btn_element);
+            // create HTML elements
+            // create main element
+            var jlc_cover_element = CreateElement('div', {
+                className: 'jlc-app-cover'
+            });
+            wrapper.appendChild(jlc_cover_element);
 
-        // create main form
-        const jlc_form_element = CreateElement('form', {
-            className: 'jlc-form jlc-form__focused'
-        });
-        jlc_cover_element.appendChild(jlc_form_element);
+            // create main button
+            var jlc_btn_element = CreateElement('button', {
+                className: 'jlc-btn'
+            }, jlc_button_text);
+            jlc_cover_element.appendChild(jlc_btn_element);
 
-        // create email input
-        const jlc_input_element = CreateElement('input', {
-            className: 'jlc-input',
-            placeholder: 'your@email.com',
-            type: 'text',
-            required: 'true',
-            name: 'email'
-        });
-        jlc_form_element.appendChild(jlc_input_element);
+            // create main form
+            var jlc_form_element = CreateElement('form', {
+                className: 'jlc-form jlc-form__focused'
+            });
+            jlc_cover_element.appendChild(jlc_form_element);
 
-        // create form button
-        const jlc_sbmt_element = CreateElement('button', {
-            className: 'jlc-sbmt'
-        });
-        jlc_form_element.appendChild(jlc_sbmt_element);
+            // create email input
+            var jlc_input_element = CreateElement('input', {
+                className: 'jlc-input',
+                placeholder: 'your@email.com',
+                type: 'text',
+                required: 'true',
+                name: 'email'
+            });
+            jlc_form_element.appendChild(jlc_input_element);
 
-        // EVENTS
-        // show form
-        jlc_btn_element.addEventListener('click', ShowForm);
-        // send form
-        if (jlc_form_element.addEventListener) {
-            jlc_form_element.addEventListener('submit', SubmitForm, false); //Modern browsers
-        } else if (jlc_form_element.attachEvent) {
-            jlc_form_element.attachEvent('onsubmit', SubmitForm); //Old IE
-        }
+            // create form button
+            var jlc_sbmt_element = CreateElement('button', {
+                className: 'jlc-sbmt'
+            });
+            jlc_form_element.appendChild(jlc_sbmt_element);
 
-        jlc_input_element.addEventListener("change", ValidateInputedEmail, false);
-        jlc_input_element.addEventListener("keyup", ValidateInputedEmail, false);
+            // EVENTS
+            // show form
+            jlc_btn_element.addEventListener('click', ShowForm);
+            // send form
+            if (jlc_form_element.addEventListener) {
+                jlc_form_element.addEventListener('submit', SubmitForm, false); //Modern browsers
+            } else if (jlc_form_element.attachEvent) {
+                jlc_form_element.attachEvent('onsubmit', SubmitForm); //Old IE
+            }
 
-        ToggleShowElement(wrapper, true)
+            jlc_input_element.addEventListener("change", ValidateInputedEmail, false);
+            jlc_input_element.addEventListener("keyup", ValidateInputedEmail, false);
 
+            ToggleShowElement(wrapper, true)
     });
-
 
     // FUNCTIONS
     /* create DOM element function.
@@ -95,7 +93,7 @@
     */
 
     function CreateElement(tagName, attrs, text) {
-        const element = document.createElement(tagName);
+        var element = document.createElement(tagName);
         if (attrs) {
             for (let attribute in attrs) {
                 let value = attrs[attribute];
@@ -115,7 +113,7 @@
     }
 
     function ShowForm() {
-        const wrapper = FindClosestAncestor(this, '.jlc-app'),
+        var wrapper = FindClosestAncestor(this, '.jlc-app'),
             jlc_cover_element = wrapper.getElementsByClassName("jlc-app-cover")[0],
             jlc_form_element = wrapper.getElementsByClassName("jlc-form")[0],
             jlc_form_btn = wrapper.getElementsByClassName("jlc-btn")[0],
@@ -137,12 +135,11 @@
                 other_form_input.value = '';
                 VanilaRemoveClasss(active_form, 'jlc-form__valid');
             }
-
         }
 
         VanilaAddClass(jlc_cover_element, 'is_active');
-        const jlc_form_element_style = window.getComputedStyle(jlc_form_element);
-        const jlc_form_element_minWidth = jlc_form_element_style.getPropertyValue('min-width');
+        var jlc_form_element_style = window.getComputedStyle(jlc_form_element);
+        var jlc_form_element_minWidth = jlc_form_element_style.getPropertyValue('min-width');
         if (parseInt(jlc_form_element_minWidth) !== 0) {
             wrapper.style.width = wrapper.style.minWidth = jlc_form_btn.style.width = jlc_form_element_minWidth;
         }
@@ -163,9 +160,9 @@
     }
 
     function ValidateInputedEmail(event) {
-        const element = event.target;
-        const wrapper = FindClosestAncestor(element, '.jlc-app');
-        const jlc_form_element = wrapper.getElementsByClassName("jlc-form")[0];
+        var element = event.target;
+        var wrapper = FindClosestAncestor(element, '.jlc-app');
+        var jlc_form_element = wrapper.getElementsByClassName("jlc-form")[0];
         let result = ValidateEmail(event.target.value);
         if (result) {
             VanilaAddClass(jlc_form_element, 'jlc-form__valid');
@@ -180,7 +177,7 @@
     }
 
     function ShowErrorMessage(message, jlcWrapper) {
-        const jlc_error_element = CreateElement('div', {
+        var jlc_error_element = CreateElement('div', {
             class: 'jlc-error'
         }, message);
         jlcWrapper.appendChild(jlc_error_element);
@@ -242,7 +239,7 @@
             "eventAction": oParams.action || '',
             "eventLabel": oParams.label || ''
         };
-        
+
 
         if (Object.prototype.hasOwnProperty.call(oParams, "value")) {
             oOptions.eventValue = oParams.value;
@@ -291,7 +288,7 @@
     function SubmitForm(event) {
         event.preventDefault();
 
-        const wrapper = FindClosestAncestor(this, '.jlc-app'),
+        var wrapper = FindClosestAncestor(this, '.jlc-app'),
             jlc_form_element = wrapper.getElementsByClassName("jlc-form")[0],
             jlc_sbmt_element = wrapper.getElementsByClassName("jlc-sbmt")[0],
             jlc_input_element = wrapper.getElementsByClassName("jlc-input")[0],
@@ -302,7 +299,7 @@
             return;
         }
 
-        const jlc_text_error = wrapper.getAttribute('data-tx-error') || 'An error has occurred, please try again later',
+        var jlc_text_error = wrapper.getAttribute('data-tx-error') || 'An error has occurred, please try again later',
             jlc_text_success = wrapper.getAttribute('data-tx-success') || 'CHECK YOUR EMAIL',
             app_id = wrapper.getAttribute('data-app-id') || false,
             manifest = wrapper.getAttribute('data-manifest') || false,
@@ -317,11 +314,11 @@
             wrapper.removeChild(jlc_error_element)
         }
 
-        const email = jlc_input_element.value,
+        var email = jlc_input_element.value,
             modal = document.getElementById('AppHostersModal');
 
         if (modal && wrapper.classList.contains('hosters-modal-call')) {
-            const modal_email = document.getElementById('user_email');
+            var modal_email = document.getElementById('user_email');
             modal_email.value = email;
 
             modalShow(modal);
@@ -425,7 +422,7 @@
                                             }
 
 
-                                            const hosters_modal_element = CreateElement('div', {
+                                            var hosters_modal_element = CreateElement('div', {
                                                 className: 'app_hosters_modal',
                                                 id: 'AppHostersModal'
                                             });
@@ -449,22 +446,22 @@
                                                 }
                                             });
 
-                                            const modal_dialog = CreateElement('div', {
+                                            var modal_dialog = CreateElement('div', {
                                                 className: 'modal-dialog',
                                             });
                                             hosters_modal_element.append(modal_dialog);
 
-                                            const modal_content = CreateElement('div', {
+                                            var modal_content = CreateElement('div', {
                                                 className: 'modal-content',
                                             });
                                             modal_dialog.append(modal_content);
 
-                                            const jlc_modal_title = CreateElement('span', {
+                                            var jlc_modal_title = CreateElement('span', {
                                                 className: 'jlc-modal--title',
                                             }, 'Choose Service Provider to Install Application');
                                             modal_content.append(jlc_modal_title);
 
-                                            const jlc_modal_close = CreateElement('span', {
+                                            var jlc_modal_close = CreateElement('span', {
                                                 className: 'jlc-modal--close',
                                                 'data-dismiss': 'modal',
                                             });
@@ -476,7 +473,7 @@
                                                 })
                                             });
 
-                                            const jlc_modal_form = CreateElement('form', {
+                                            var jlc_modal_form = CreateElement('form', {
                                                 className: 'jlc-modal--form',
                                                 action: '#'
                                             });
@@ -492,7 +489,7 @@
                                             function SubmitModalForm(event) {
                                                 event.preventDefault();
 
-                                                const wrapper = FindClosestAncestor(document.querySelectorAll('.hosters-modal-call .jlc-app-cover.is_active')[0], '.jlc-app'),
+                                                var wrapper = FindClosestAncestor(document.querySelectorAll('.hosters-modal-call .jlc-app-cover.is_active')[0], '.jlc-app'),
                                                     jlc_form_element = wrapper.getElementsByClassName("jlc-form")[0],
                                                     jlc_sbmt_element = wrapper.getElementsByClassName("jlc-sbmt")[0],
                                                     jlc_input_element = wrapper.getElementsByClassName("jlc-input")[0],
@@ -512,9 +509,9 @@
                                                 // check if error message is shown and delete it
                                                 let jlc_error_element = document.getElementsByClassName('jlc-error')[0];
 
-                                                const email = jlc_email_element.value;
+                                                var email = jlc_email_element.value;
 
-                                                const msg = JSON.stringify({
+                                                var msg = JSON.stringify({
                                                     app: app_id,
                                                     email: email,
                                                     group: group,
@@ -544,8 +541,8 @@
                                                     url: installAppURL,
                                                     success: function (response) {
                                                         var oResp = jQuery.parseJSON(response) || {};
-
-                                                        if (oResp.response.result === 0 && oResp.response) {
+                                                        
+                                                        if (oResp.response && oResp.response.result == 0) {
                                                             modalHide(hosters_modal_element, function () {
                                                                 body.classList.remove('modal-open');
                                                             });
@@ -580,7 +577,7 @@
                                                 });
                                             }
 
-                                            const jlc_modal_form_email = CreateElement('input', {
+                                            var jlc_modal_form_email = CreateElement('input', {
                                                 id: 'user_email',
                                                 type: 'hidden',
                                                 value: '',
@@ -588,15 +585,15 @@
                                             });
                                             jlc_modal_form.append(jlc_modal_form_email);
 
-                                            const jlc_modal_form_grid = CreateElement('div', {
+                                            var jlc_modal_form_grid = CreateElement('div', {
                                                 className: 'hosters-grid'
                                             });
                                             jlc_modal_form.append(jlc_modal_form_grid);
 
                                             $.each(window.hosters, function (index, hoster) {
-                                                
+
                                                 if (!hoster.hasSignup) return;
-                                                
+
                                                 var jlc_modal_form_hoster = CreateElement('div', {
                                                     className: 'hoster'
                                                 });
@@ -768,844 +765,6 @@
                                                     }, 'Location');
                                                     info_modal_row.append(info_modal_row_left);
 
-                                                    var countries = {
-                                                        "GD": [
-                                                            "Grenada"
-                                                        ],
-                                                        "GE": [
-                                                            "Georgia"
-                                                        ],
-                                                        "GF": [
-                                                            "French Guiana"
-                                                        ],
-                                                        "GA": [
-                                                            "Gabon"
-                                                        ],
-                                                        "GB": [
-                                                            "the United Kingdom",
-                                                            "UK"
-                                                        ],
-                                                        "FK": [
-                                                            "Falkland Islands (Malvinas)"
-                                                        ],
-                                                        "FJ": [
-                                                            "Fiji"
-                                                        ],
-                                                        "FM": [
-                                                            "Micronesia"
-                                                        ],
-                                                        "FI": [
-                                                            "Finland"
-                                                        ],
-                                                        "FR": [
-                                                            "France"
-                                                        ],
-                                                        "FO": [
-                                                            "Faroe Islands"
-                                                        ],
-                                                        "GY": [
-                                                            "Guyana"
-                                                        ],
-                                                        "GW": [
-                                                            "Guinea-Bissau"
-                                                        ],
-                                                        "WS": [
-                                                            "Samoa"
-                                                        ],
-                                                        "GN": [
-                                                            "Guinea"
-                                                        ],
-                                                        "GM": [
-                                                            "Gambia"
-                                                        ],
-                                                        "GL": [
-                                                            "Greenland"
-                                                        ],
-                                                        "GI": [
-                                                            "Gibraltar"
-                                                        ],
-                                                        "GH": [
-                                                            "Ghana"
-                                                        ],
-                                                        "GG": [
-                                                            "Guernsey"
-                                                        ],
-                                                        "GU": [
-                                                            "Guam"
-                                                        ],
-                                                        "GT": [
-                                                            "Guatemala"
-                                                        ],
-                                                        "GS": [
-                                                            "South Georgia and the South Sandwich Islands"
-                                                        ],
-                                                        "GR": [
-                                                            "Greece"
-                                                        ],
-                                                        "GQ": [
-                                                            "Equatorial Guinea"
-                                                        ],
-                                                        "WF": [
-                                                            "Wallis and Futuna"
-                                                        ],
-                                                        "GP": [
-                                                            "Guadeloupe"
-                                                        ],
-                                                        "VI": [
-                                                            "Virgin Islands"
-                                                        ],
-                                                        "DZ": [
-                                                            "Algeria"
-                                                        ],
-                                                        "VG": [
-                                                            "Virgin Islands"
-                                                        ],
-                                                        "VU": [
-                                                            "Vanuatu"
-                                                        ],
-                                                        "VN": [
-                                                            "Vietnam"
-                                                        ],
-                                                        "EC": [
-                                                            "Ecuador"
-                                                        ],
-                                                        "DE": [
-                                                            "Germany"
-                                                        ],
-                                                        "UZ": [
-                                                            "Uzbekistan"
-                                                        ],
-                                                        "UY": [
-                                                            "Uruguay"
-                                                        ],
-                                                        "DK": [
-                                                            "Denmark"
-                                                        ],
-                                                        "DJ": [
-                                                            "Djibouti"
-                                                        ],
-                                                        "VE": [
-                                                            "Venezuela"
-                                                        ],
-                                                        "DM": [
-                                                            "Dominica"
-                                                        ],
-                                                        "VC": [
-                                                            "Saint Vincent and the Grenadines"
-                                                        ],
-                                                        "DO": [
-                                                            "Dominican Republic"
-                                                        ],
-                                                        "VA": [
-                                                            "Holy See (Vatican City State)"
-                                                        ],
-                                                        "EU": [
-                                                            "Europe"
-                                                        ],
-                                                        "UG": [
-                                                            "Uganda"
-                                                        ],
-                                                        "US": [
-                                                            "the USA",
-                                                            "North America"
-                                                        ],
-                                                        "UM": [
-                                                            "United States Minor Outlying Islands"
-                                                        ],
-                                                        "EH": [
-                                                            "Western Sahara"
-                                                        ],
-                                                        "EG": [
-                                                            "Egypt"
-                                                        ],
-                                                        "TZ": [
-                                                            "Tanzania"
-                                                        ],
-                                                        "EE": [
-                                                            "Estonia"
-                                                        ],
-                                                        "TT": [
-                                                            "Trinidad and Tobago"
-                                                        ],
-                                                        "TW": [
-                                                            "Taiwan"
-                                                        ],
-                                                        "TV": [
-                                                            "Tuvalu"
-                                                        ],
-                                                        "UA": [
-                                                            "Ukraine"
-                                                        ],
-                                                        "ET": [
-                                                            "Ethiopia"
-                                                        ],
-                                                        "ES": [
-                                                            "Spain"
-                                                        ],
-                                                        "ER": [
-                                                            "Eritrea"
-                                                        ],
-                                                        "TO": [
-                                                            "Tonga"
-                                                        ],
-                                                        "TN": [
-                                                            "Tunisia"
-                                                        ],
-                                                        "TM": [
-                                                            "Turkmenistan"
-                                                        ],
-                                                        "TL": [
-                                                            "Timor-Leste"
-                                                        ],
-                                                        "CA": [
-                                                            "Canada"
-                                                        ],
-                                                        "TR": [
-                                                            "Turkey"
-                                                        ],
-                                                        "BZ": [
-                                                            "Belize"
-                                                        ],
-                                                        "TG": [
-                                                            "Togo"
-                                                        ],
-                                                        "BW": [
-                                                            "Botswana"
-                                                        ],
-                                                        "TF": [
-                                                            "French Southern Territories"
-                                                        ],
-                                                        "BV": [
-                                                            "Bouvet Island"
-                                                        ],
-                                                        "BY": [
-                                                            "Belarus"
-                                                        ],
-                                                        "TD": [
-                                                            "Chad"
-                                                        ],
-                                                        "TK": [
-                                                            "Tokelau"
-                                                        ],
-                                                        "BS": [
-                                                            "Bahamas"
-                                                        ],
-                                                        "TJ": [
-                                                            "Tajikistan"
-                                                        ],
-                                                        "BR": [
-                                                            "Brazil"
-                                                        ],
-                                                        "TH": [
-                                                            "Thailand"
-                                                        ],
-                                                        "BT": [
-                                                            "Bhutan"
-                                                        ],
-                                                        "BN": [
-                                                            "Brunei Darussalam"
-                                                        ],
-                                                        "BO": [
-                                                            "Bolivia"
-                                                        ],
-                                                        "BQ": [
-                                                            "Bonaire"
-                                                        ],
-                                                        "BJ": [
-                                                            "Benin"
-                                                        ],
-                                                        "TC": [
-                                                            "Turks and Caicos Islands"
-                                                        ],
-                                                        "BL": [
-                                                            "Saint Bartelemey"
-                                                        ],
-                                                        "BM": [
-                                                            "Bermuda"
-                                                        ],
-                                                        "BF": [
-                                                            "Burkina Faso"
-                                                        ],
-                                                        "SV": [
-                                                            "El Salvador"
-                                                        ],
-                                                        "BG": [
-                                                            "Bulgaria"
-                                                        ],
-                                                        "SS": [
-                                                            "South Sudan"
-                                                        ],
-                                                        "BH": [
-                                                            "Bahrain"
-                                                        ],
-                                                        "ST": [
-                                                            "Sao Tome and Principe"
-                                                        ],
-                                                        "BI": [
-                                                            "Burundi"
-                                                        ],
-                                                        "SY": [
-                                                            "Syrian Arab Republic"
-                                                        ],
-                                                        "BB": [
-                                                            "Barbados"
-                                                        ],
-                                                        "SZ": [
-                                                            "Swaziland"
-                                                        ],
-                                                        "BD": [
-                                                            "Bangladesh"
-                                                        ],
-                                                        "SX": [
-                                                            "Sint Maarten"
-                                                        ],
-                                                        "BE": [
-                                                            "Belgium"
-                                                        ],
-                                                        "SL": [
-                                                            "Sierra Leone"
-                                                        ],
-                                                        "SK": [
-                                                            "Slovakia"
-                                                        ],
-                                                        "SN": [
-                                                            "Senegal"
-                                                        ],
-                                                        "SM": [
-                                                            "San Marino"
-                                                        ],
-                                                        "SO": [
-                                                            "Somalia"
-                                                        ],
-                                                        "SR": [
-                                                            "Suriname"
-                                                        ],
-                                                        "SD": [
-                                                            "Sudan"
-                                                        ],
-                                                        "CZ": [
-                                                            "Czech Republic"
-                                                        ],
-                                                        "SC": [
-                                                            "Seychelles"
-                                                        ],
-                                                        "CY": [
-                                                            "Cyprus"
-                                                        ],
-                                                        "CX": [
-                                                            "Christmas Island"
-                                                        ],
-                                                        "SE": [
-                                                            "Sweden"
-                                                        ],
-                                                        "CW": [
-                                                            "Curacao"
-                                                        ],
-                                                        "SH": [
-                                                            "Saint Helena"
-                                                        ],
-                                                        "CV": [
-                                                            "Cape Verde"
-                                                        ],
-                                                        "SG": [
-                                                            "Singapore"
-                                                        ],
-                                                        "CU": [
-                                                            "Cuba"
-                                                        ],
-                                                        "SJ": [
-                                                            "Svalbard and Jan Mayen"
-                                                        ],
-                                                        "SI": [
-                                                            "Slovenia"
-                                                        ],
-                                                        "CR": [
-                                                            "Costa Rica"
-                                                        ],
-                                                        "CO": [
-                                                            "Colombia"
-                                                        ],
-                                                        "CM": [
-                                                            "Cameroon"
-                                                        ],
-                                                        "CN": [
-                                                            "China"
-                                                        ],
-                                                        "SA": [
-                                                            "Saudi Arabia"
-                                                        ],
-                                                        "CK": [
-                                                            "Cook Islands"
-                                                        ],
-                                                        "SB": [
-                                                            "Solomon Islands"
-                                                        ],
-                                                        "CL": [
-                                                            "Chile"
-                                                        ],
-                                                        "CI": [
-                                                            "Cote d'Ivoire"
-                                                        ],
-                                                        "RS": [
-                                                            "Serbia"
-                                                        ],
-                                                        "CG": [
-                                                            "Congo"
-                                                        ],
-                                                        "RU": [
-                                                            "Russian Federation"
-                                                        ],
-                                                        "CH": [
-                                                            "Switzerland"
-                                                        ],
-                                                        "RW": [
-                                                            "Rwanda"
-                                                        ],
-                                                        "CF": [
-                                                            "Central African Republic"
-                                                        ],
-                                                        "CC": [
-                                                            "Cocos (Keeling) Islands"
-                                                        ],
-                                                        "CD": [
-                                                            "Congo"
-                                                        ],
-                                                        "RO": [
-                                                            "Romania"
-                                                        ],
-                                                        "RE": [
-                                                            "Reunion"
-                                                        ],
-                                                        "AZ": [
-                                                            "Azerbaijan"
-                                                        ],
-                                                        "BA": [
-                                                            "Bosnia and Herzegovina"
-                                                        ],
-                                                        "AT": [
-                                                            "Austria"
-                                                        ],
-                                                        "AS": [
-                                                            "American Samoa"
-                                                        ],
-                                                        "AR": [
-                                                            "Argentina"
-                                                        ],
-                                                        "AQ": [
-                                                            "Antarctica"
-                                                        ],
-                                                        "AX": [
-                                                            "Aland Islands"
-                                                        ],
-                                                        "AW": [
-                                                            "Aruba"
-                                                        ],
-                                                        "QA": [
-                                                            "Qatar"
-                                                        ],
-                                                        "AU": [
-                                                            "Australia"
-                                                        ],
-                                                        "AL": [
-                                                            "Albania"
-                                                        ],
-                                                        "AI": [
-                                                            "Anguilla"
-                                                        ],
-                                                        "AO": [
-                                                            "Angola"
-                                                        ],
-                                                        "AP": [
-                                                            "Asia/Pacific Region"
-                                                        ],
-                                                        "PY": [
-                                                            "Paraguay"
-                                                        ],
-                                                        "AM": [
-                                                            "Armenia"
-                                                        ],
-                                                        "PT": [
-                                                            "Portugal"
-                                                        ],
-                                                        "AD": [
-                                                            "Andorra"
-                                                        ],
-                                                        "PW": [
-                                                            "Palau"
-                                                        ],
-                                                        "AG": [
-                                                            "Antigua and Barbuda"
-                                                        ],
-                                                        "AE": [
-                                                            "United Arab Emirates"
-                                                        ],
-                                                        "PR": [
-                                                            "Puerto Rico"
-                                                        ],
-                                                        "AF": [
-                                                            "Afghanistan"
-                                                        ],
-                                                        "PS": [
-                                                            "Palestinian Territory"
-                                                        ],
-                                                        "NU": [
-                                                            "Niue"
-                                                        ],
-                                                        "NR": [
-                                                            "Nauru"
-                                                        ],
-                                                        "NP": [
-                                                            "Nepal"
-                                                        ],
-                                                        "NO": [
-                                                            "Norway"
-                                                        ],
-                                                        "NZ": [
-                                                            "New Zealand"
-                                                        ],
-                                                        "OM": [
-                                                            "Oman"
-                                                        ],
-                                                        "PE": [
-                                                            "Peru"
-                                                        ],
-                                                        "PF": [
-                                                            "French Polynesia"
-                                                        ],
-                                                        "PG": [
-                                                            "Papua New Guinea"
-                                                        ],
-                                                        "PA": [
-                                                            "Panama"
-                                                        ],
-                                                        "PL": [
-                                                            "Poland"
-                                                        ],
-                                                        "PM": [
-                                                            "Saint Pierre and Miquelon"
-                                                        ],
-                                                        "PN": [
-                                                            "Pitcairn"
-                                                        ],
-                                                        "PH": [
-                                                            "Philippines"
-                                                        ],
-                                                        "PK": [
-                                                            "Pakistan"
-                                                        ],
-                                                        "LS": [
-                                                            "Lesotho"
-                                                        ],
-                                                        "LR": [
-                                                            "Liberia"
-                                                        ],
-                                                        "LV": [
-                                                            "Latvia"
-                                                        ],
-                                                        "LU": [
-                                                            "Luxembourg"
-                                                        ],
-                                                        "LT": [
-                                                            "Lithuania"
-                                                        ],
-                                                        "LY": [
-                                                            "Libyan Arab Jamahiriya"
-                                                        ],
-                                                        "MC": [
-                                                            "Monaco"
-                                                        ],
-                                                        "MD": [
-                                                            "Moldova"
-                                                        ],
-                                                        "MA": [
-                                                            "Morocco"
-                                                        ],
-                                                        "A1": [
-                                                            "Anonymous Proxy"
-                                                        ],
-                                                        "MG": [
-                                                            "Madagascar"
-                                                        ],
-                                                        "A2": [
-                                                            "Satellite Provider"
-                                                        ],
-                                                        "MH": [
-                                                            "Marshall Islands"
-                                                        ],
-                                                        "ME": [
-                                                            "Montenegro"
-                                                        ],
-                                                        "MF": [
-                                                            "Saint Martin"
-                                                        ],
-                                                        "MK": [
-                                                            "Macedonia"
-                                                        ],
-                                                        "ML": [
-                                                            "Mali"
-                                                        ],
-                                                        "MN": [
-                                                            "Mongolia"
-                                                        ],
-                                                        "MM": [
-                                                            "Myanmar"
-                                                        ],
-                                                        "MP": [
-                                                            "Northern Mariana Islands"
-                                                        ],
-                                                        "O1": [
-                                                            "Other Country"
-                                                        ],
-                                                        "MO": [
-                                                            "Macao"
-                                                        ],
-                                                        "MR": [
-                                                            "Mauritania"
-                                                        ],
-                                                        "MQ": [
-                                                            "Martinique"
-                                                        ],
-                                                        "MT": [
-                                                            "Malta"
-                                                        ],
-                                                        "MS": [
-                                                            "Montserrat"
-                                                        ],
-                                                        "MV": [
-                                                            "Maldives"
-                                                        ],
-                                                        "MU": [
-                                                            "Mauritius"
-                                                        ],
-                                                        "MX": [
-                                                            "Mexico"
-                                                        ],
-                                                        "MW": [
-                                                            "Malawi"
-                                                        ],
-                                                        "MZ": [
-                                                            "Mozambique"
-                                                        ],
-                                                        "MY": [
-                                                            "Malaysia"
-                                                        ],
-                                                        "NA": [
-                                                            "Namibia"
-                                                        ],
-                                                        "NC": [
-                                                            "New Caledonia"
-                                                        ],
-                                                        "NE": [
-                                                            "Niger"
-                                                        ],
-                                                        "NF": [
-                                                            "Norfolk Island"
-                                                        ],
-                                                        "NG": [
-                                                            "Nigeria"
-                                                        ],
-                                                        "NI": [
-                                                            "Nicaragua"
-                                                        ],
-                                                        "NL": [
-                                                            "the Netherlands",
-                                                            "Holland"
-                                                        ],
-                                                        "JP": [
-                                                            "Japan"
-                                                        ],
-                                                        "JO": [
-                                                            "Jordan"
-                                                        ],
-                                                        "JM": [
-                                                            "Jamaica"
-                                                        ],
-                                                        "KI": [
-                                                            "Kiribati"
-                                                        ],
-                                                        "KH": [
-                                                            "Cambodia"
-                                                        ],
-                                                        "KG": [
-                                                            "Kyrgyzstan"
-                                                        ],
-                                                        "KE": [
-                                                            "Kenya"
-                                                        ],
-                                                        "KW": [
-                                                            "Kuwait"
-                                                        ],
-                                                        "KY": [
-                                                            "Cayman Islands"
-                                                        ],
-                                                        "KZ": [
-                                                            "Kazakhstan"
-                                                        ],
-                                                        "KP": [
-                                                            "Korea"
-                                                        ],
-                                                        "KR": [
-                                                            "Korea"
-                                                        ],
-                                                        "KM": [
-                                                            "Comoros"
-                                                        ],
-                                                        "KN": [
-                                                            "Saint Kitts and Nevis"
-                                                        ],
-                                                        "LI": [
-                                                            "Liechtenstein"
-                                                        ],
-                                                        "LK": [
-                                                            "Sri Lanka"
-                                                        ],
-                                                        "LA": [
-                                                            "Lao People's Democratic Republic"
-                                                        ],
-                                                        "LC": [
-                                                            "Saint Lucia"
-                                                        ],
-                                                        "LB": [
-                                                            "Lebanon"
-                                                        ],
-                                                        "HR": [
-                                                            "Croatia"
-                                                        ],
-                                                        "HT": [
-                                                            "Haiti"
-                                                        ],
-                                                        "HU": [
-                                                            "Hungary"
-                                                        ],
-                                                        "HK": [
-                                                            "Hong Kong"
-                                                        ],
-                                                        "ZA": [
-                                                            "South Africa"
-                                                        ],
-                                                        "HN": [
-                                                            "Honduras"
-                                                        ],
-                                                        "HM": [
-                                                            "Heard Island and McDonald Islands"
-                                                        ],
-                                                        "ZW": [
-                                                            "Zimbabwe"
-                                                        ],
-                                                        "ID": [
-                                                            "Indonesia"
-                                                        ],
-                                                        "IE": [
-                                                            "Ireland"
-                                                        ],
-                                                        "ZM": [
-                                                            "Zambia"
-                                                        ],
-                                                        "IQ": [
-                                                            "Iraq"
-                                                        ],
-                                                        "IR": [
-                                                            "Iran"
-                                                        ],
-                                                        "YE": [
-                                                            "Yemen"
-                                                        ],
-                                                        "IS": [
-                                                            "Iceland"
-                                                        ],
-                                                        "IT": [
-                                                            "Italy"
-                                                        ],
-                                                        "IL": [
-                                                            "Israel"
-                                                        ],
-                                                        "IM": [
-                                                            "Isle of Man"
-                                                        ],
-                                                        "IN": [
-                                                            "India"
-                                                        ],
-                                                        "IO": [
-                                                            "British Indian Ocean Territory"
-                                                        ],
-                                                        "JE": [
-                                                            "Jersey"
-                                                        ],
-                                                        "YT": [
-                                                            "Mayotte"
-                                                        ]
-                                                    };
-                                                    var location = {
-                                                        "US": {
-                                                            "LA": "Los Angeles",
-                                                            "CH": "Chicago",
-                                                            "TX": "Texas",
-                                                            "GA": "Georgia",
-                                                            "NJ": "New Jersey",
-                                                            "NY": "New York",
-                                                            "NY1": "New York 1",
-                                                            "NY2": "New York 2"
-                                                        },
-                                                        "FI": {
-                                                            "HE": "Helsinki",
-                                                            "ES": "Espoo"
-                                                        },
-                                                        "CH": {
-                                                            "ATT": "Attinghausen",
-                                                            "ZU": "Zurich",
-                                                            "BN": "Bern",
-                                                            "GG": "Gland - Geneva",
-                                                            "GN1": "Geneva 1",
-                                                            "GN2": "Geneva 2"
-                                                        },
-                                                        "BR": {
-                                                            "CMP": "Campinas",
-                                                            "NOR": "Nordeste",
-                                                            "SP": "São Paulo"
-                                                        },
-                                                        "BE": {
-                                                            "NL": "datacenter in the Netherlands"
-                                                        },
-                                                        "IN": {
-                                                            "PU": "Pune"
-                                                        },
-                                                        "IL": {
-                                                            "RH": "Rosh Haayin",
-                                                            "JF": "Jaffa"
-                                                        },
-                                                        "NL": {
-                                                            "MP": "Meppel",
-                                                            "DT": "Dronten",
-                                                            "AM": "Amsterdam",
-                                                            "HW": "Hengelo West",
-                                                            "HS": "Hengelo South"
-                                                        },
-                                                        "SE": {
-                                                            "SH1": "Stockholm North",
-                                                            "SH2": "Stockholm South",
-                                                            "SH3": "Stockholm West"
-                                                        },
-                                                        "SA": {
-                                                            "JD": "Jeddah",
-                                                            "RD": "Riyadh",
-                                                            "KH": "Khobar"
-                                                        },
-                                                        "GB": {
-                                                            "LND": "London",
-                                                            "LND1": "London 1",
-                                                            "LND2": "London 2"
-                                                        },
-                                                        "DE": {
-                                                            "FR": "Frankfurt"
-                                                        },
-                                                        "RU": {
-                                                            "MO": "Moscow"
-                                                        },
-                                                        "FR": {
-                                                            "AP": "Aix-en-Provence"
-                                                        }
-                                                    };
-
                                                     var regions = '';
                                                     if (Object.keys(oHoster.performanceRegions).length) {
                                                         $.each(oHoster.performanceRegions, function (code, stars) {
@@ -1616,9 +775,9 @@
                                                                 '<i class="flag flag-' + code.toLowerCase() + '"></i>' +
                                                                 '<span class="right-part">' +
                                                                 '<span class="location-rating">' + Math.round(stars) + '</span>' +
-                                                                '<span class="location-country">' + countries[code][0];
+                                                                '<span class="location-country">' + window.jwidjets.installapp.countries[code][0];
                                                             if (additional) {
-                                                                regions += '<span class="location-additional">(' + location[code][additional] + ')</span>';
+                                                                regions += '<span class="location-additional">(' + window.jwidjets.installapp.location[code][additional] + ')</span>';
                                                             }
                                                             regions += '</span>' +
                                                                 '</span>' +
@@ -1719,36 +878,36 @@
                                             });
 
 
-                                            const jlc_modal_form_line = CreateElement('div', {
+                                            var jlc_modal_form_line = CreateElement('div', {
                                                 className: 'gradient-line'
                                             });
                                             jlc_modal_form.append(jlc_modal_form_line);
 
-                                            const jlc_modal_form_checkbox = CreateElement('div', {
+                                            var jlc_modal_form_checkbox = CreateElement('div', {
                                                 className: 'jlc-gdpr--checkbox'
                                             });
                                             jlc_modal_form.append(jlc_modal_form_checkbox);
 
 
-                                            const jlc_modal_form_checkbox_label = CreateElement('label', {});
+                                            var jlc_modal_form_checkbox_label = CreateElement('label', {});
                                             jlc_modal_form_checkbox.append(jlc_modal_form_checkbox_label);
 
-                                            const jlc_modal_form_checkbox_input = CreateElement('input', {
+                                            var jlc_modal_form_checkbox_input = CreateElement('input', {
                                                 type: 'checkbox'
                                             });
                                             jlc_modal_form_checkbox_label.append(jlc_modal_form_checkbox_input);
 
 
-                                            const jlc_modal_form_checkbox_span = CreateElement('span', {});
+                                            var jlc_modal_form_checkbox_span = CreateElement('span', {});
                                             jlc_modal_form_checkbox_label.append(jlc_modal_form_checkbox_span);
                                             jlc_modal_form_checkbox_span.insertAdjacentHTML('beforeEnd', "I read and agree to <a href=\"https://jelastic.com/terms/\" target='_blank'>Jelastic Terms of Use </a>and <a href=\"https://jelastic.com/policy/\" target='_blank'>Privacy Policy</a>");
 
-                                            const jlc_modal_form_checkbox_required = CreateElement('span', {
+                                            var jlc_modal_form_checkbox_required = CreateElement('span', {
                                                 className: 'gfield_required'
                                             }, '*');
                                             jlc_modal_form_checkbox_span.append(jlc_modal_form_checkbox_required);
 
-                                            const jlc_modal_form_submit = CreateElement('input', {
+                                            var jlc_modal_form_submit = CreateElement('input', {
                                                 className: 'jlc-form--submit submit-disabled',
                                                 value: 'Install',
                                                 type: 'submit',
