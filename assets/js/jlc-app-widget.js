@@ -386,14 +386,14 @@
                 (function () {
                     $.ajax({
                             type: "GET",
-                            url: "//platforms-info.jelastic.com/api/site/GetHosters",
+                            url: "https://jelastic.cloud/wp-json/jelastic/hosters",
                             async: false,
                             success: function (response) {
 
                                 var oResp;
 
-                                if (response.result === 0 && response.hosters) {
-                                    window.hosters = response.hosters;
+                                if (response.response) {
+                                    window.hosters = Object.values(response.response);
 
                                     $.ajax({
                                         type: "GET",
@@ -704,7 +704,7 @@
                                                     info_modal_row.append(info_modal_row_left);
 
                                                     var stars = '';
-                                                    if (oHoster.support === 'new') {
+                                                    if (oHoster.support === 'new' || oHoster.support == 0) {
                                                         stars = '<i class="ico ico--new"></i>';
                                                     } else {
                                                         var rating
@@ -775,9 +775,9 @@
                                                                 '<i class="flag flag-' + code.toLowerCase() + '"></i>' +
                                                                 '<span class="right-part">' +
                                                                 '<span class="location-rating">' + Math.round(stars) + '</span>' +
-                                                                '<span class="location-country">' + window.jwidjets.installapp.countries[code][0];
+                                                                '<span class="location-country">' + window.jwidgets.installapp.countries[code][0];
                                                             if (additional) {
-                                                                regions += '<span class="location-additional">(' + window.jwidjets.installapp.location[code][additional] + ')</span>';
+                                                                regions += '<span class="location-additional">(' + window.jwidgets.installapp.location[code][additional] + ')</span>';
                                                             }
                                                             regions += '</span>' +
                                                                 '</span>' +
@@ -787,7 +787,7 @@
                                                         regions += '<p>' +
                                                             '<i class="flag flag-' + oHoster.countryCode.toLowerCase() + '"></i>' +
                                                             '<span class="right-part">' +
-                                                            '<span class="location-country">' + oHoster.region + '</span>' +
+                                                            '<span class="location-country">' + window.jwidgets.installapp.countries[oHoster.countryCode] + '</span>' +
                                                             '</span>' +
                                                             '</p>';
                                                     }
@@ -835,7 +835,7 @@
                                                 jlc_modal_form_hoster_label.append(jlc_modal_form_hoster_logo_wrapper);
 
                                                 var jlc_modal_form_hoster_logo = CreateElement('img', {
-                                                    src: '//jelastic.com/wp-content/themes/salient/img/hosters/hosters_signin/' + hoster.keyword + '.png',
+                                                    src: hoster.logo,
                                                     alt: hoster.name
                                                 });
                                                 jlc_modal_form_hoster_logo_wrapper.append(jlc_modal_form_hoster_logo);

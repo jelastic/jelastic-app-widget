@@ -18,8 +18,7 @@ window.jwidgets = (function (that) {
                 "Gabon"
             ],
             "GB": [
-                "the United Kingdom",
-                "UK"
+                "the United Kingdom"
             ],
             "FK": [
                 "Falkland Islands (Malvinas)"
@@ -772,32 +771,47 @@ window.jwidgets = (function (that) {
             ]
         },
         location : {
-            "US": {
-                "LA": "Los Angeles",
-                "CH": "Chicago",
-                "TX": "Texas",
-                "GA": "Georgia",
-                "NJ": "New Jersey",
-                "NY": "New York",
+            "US" : {
+                "POR": "Portland",
+                "LA" : "Los Angeles",
+                "CH" : "Chicago",
+                "TX" : "Texas",
+                "GA" : "Georgia",
+                "NJ" : "New Jersey",
+                "NY" : "New York",
                 "NY1": "New York 1",
-                "NY2": "New York 2"
+                "NY2": "New York 2",
+                "VH": "Vint Hill",
+                "MI": "Miami",
+                "RI": "Richmond",
+                "PH" : "Phoenix",
+                "HI" : "Hillsboro",
+                "PHI" : "Philadelphia",
+                "DA" : "Dallas"
             },
-            "FI": {
-                "HE": "Helsinki",
-                "ES": "Espoo"
+            "BG": {
+                "SOF" : "Sofia"
+            },
+            "CA": {
+                "BEH": "Beauharnois"
+            },
+            "FI" : {
+                "HE" : "Helsinki",
+                "ES" : "Espoo"
             },
             "CH": {
                 "ATT": "Attinghausen",
-                "ZU": "Zurich",
-                "BN": "Bern",
-                "GG": "Gland - Geneva",
-                "GN1": "Geneva 1",
-                "GN2": "Geneva 2"
+                "ZU" : "Zurich",
+                "BN" : "Bern",
+                "GG" : "Gland - Geneva",
+                "GN1" : "Geneva 1",
+                "GN2" : "Geneva 2",
+                "LAU" : "Lausanne"
             },
             "BR": {
                 "CMP": "Campinas",
                 "NOR": "Nordeste",
-                "SP": "São Paulo"
+                "SP" : "São Paulo"
             },
             "BE": {
                 "NL": "datacenter in the Netherlands"
@@ -819,7 +833,8 @@ window.jwidgets = (function (that) {
             "SE": {
                 "SH1": "Stockholm North",
                 "SH2": "Stockholm South",
-                "SH3": "Stockholm West"
+                "SH3": "Stockholm West",
+                "SU": "Sundsvall"
             },
             "SA": {
                 "JD": "Jeddah",
@@ -829,7 +844,8 @@ window.jwidgets = (function (that) {
             "GB": {
                 "LND": "London",
                 "LND1": "London 1",
-                "LND2": "London 2"
+                "LND2": "London 2",
+                "MA": "Manchester"
             },
             "DE": {
                 "FR": "Frankfurt"
@@ -838,7 +854,14 @@ window.jwidgets = (function (that) {
                 "MO": "Moscow"
             },
             "FR": {
-                "AP": "Aix-en-Provence"
+                "AP": "Aix-en-Provence",
+                "MRS": "Marseille",
+            },
+            "CO": {
+                "BO": "Bogota"
+            },
+            "LY": {
+                "TR": "Tripoli"
             }
         }
     };
